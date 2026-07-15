@@ -5,7 +5,7 @@ export type CodingProfile = {
 };
 
 export const codingProfiles: CodingProfile[] = [
-  { name: "GitHub", username: "hars7itIT", url: "https://github.com/hars7itIT" },
+  { name: "GitHub", username: "hars7it", url: "https://github.com/hars7it" },
   { name: "LeetCode", username: "YDHheqYlVe", url: "https://leetcode.com/u/YDHheqYlVe/" },
   { name: "CodeChef", username: "hars7itIT", url: "https://www.codechef.com/users/hars7itIT" },
   { name: "Codeforces", username: "hars7itIT", url: "https://codeforces.com/profile/hars7itIT" },
@@ -15,7 +15,7 @@ export const socialLinks = {
   email: "Chandreshgupta999@gmail.com",
   phone: "+91 8052702560",
   linkedin: "https://www.linkedin.com/in/harshit-gupta-473821378?utm_source=share_via&utm_content=profile&utm_medium=member_android",
-  github: "https://github.com/hars7itIT",
+  github: "https://github.com/hars7it",
   instagram: "https://www.instagram.com/hars7it_?igsh=MTVpaW5vN2dpN2V2aQ%3D%3D",
   twitter: "https://x.com/HarshitGup52263",
 };
