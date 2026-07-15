@@ -1,0 +1,59 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model VisitorSession {
+  id        String           @id @default(uuid())
+  ipHash    String           // Hashed IP for privacy but tracking uniqueness
+  userAgent String?
+  createdAt DateTime         @default(now())
+  events    AnalyticsEvent[]
+}
+
+model AnalyticsEvent {
+  id        String         @id @default(uuid())
+  sessionId String
+  session   VisitorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  type      String         // "page_view", "click", "ai_chat"
+  path      String?        // e.g. "/projects", "/blog"
+  payload   String?        // Additional details in JSON
+  createdAt DateTime       @default(now())
+}
+
+model BlogPost {
+  id         String   @id @default(uuid())
+  slug       String   @unique
+  title      String
+  excerpt    String
+  content    String   // Markdown content
+  published  Boolean  @default(false)
+  category   String
+  coverImage String?
+  videoUrl   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  views      Int      @default(0)
+}
+
+model ContactSubmission {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
