@@ -42,7 +42,7 @@ export const projects: Project[] = [
       "IoT wearable biometric sync capabilities",
       "WCAG 2.2 accessibility adjustments",
     ],
-    github: "https://github.com/hars7it/WomenHealthCare",
+    github: "https://github.com/hars7itIT/WomenHealthCare",
   },
   {
     slug: "wanderlust",
