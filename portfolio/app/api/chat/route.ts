@@ -40,6 +40,55 @@ Rules:
 2. Never show the action tag syntax to the user as raw text, let it be appended at the end of the text.
 3. Keep replies friendly, concise, and under 80 words.`;
 
+function formatGeminiMessages(messages: { role: "user" | "assistant"; content: string }[]) {
+  const clean = messages.filter(m => 
+    !m.content.startsWith("[Auto-Explain]") && 
+    !m.content.startsWith("📁") && 
+    !m.content.startsWith("🎙️") && 
+    !m.content.startsWith("[Proactive")
+  );
+  const formatted: { role: "user" | "model"; parts: { text: string }[] }[] = [];
+  for (const m of clean) {
+    const role = m.role === "assistant" ? "model" : "user";
+    if (formatted.length === 0 && role === "model") continue;
+    const last = formatted[formatted.length - 1];
+    if (last && last.role === role) {
+      last.parts[0].text += "\n" + m.content;
+    } else {
+      formatted.push({ role, parts: [{ text: m.content }] });
+    }
+  }
+  if (formatted.length === 0) {
+    const lastMsg = messages[messages.length - 1]?.content ?? "Hello";
+    return [{ role: "user" as const, parts: [{ text: lastMsg }] }];
+  }
+  return formatted;
+}
+
+function formatAnthropicMessages(messages: { role: "user" | "assistant"; content: string }[]) {
+  const clean = messages.filter(m => 
+    !m.content.startsWith("[Auto-Explain]") && 
+    !m.content.startsWith("📁") && 
+    !m.content.startsWith("🎙️") && 
+    !m.content.startsWith("[Proactive")
+  );
+  const formatted: { role: "user" | "assistant"; content: string }[] = [];
+  for (const m of clean) {
+    if (formatted.length === 0 && m.role === "assistant") continue;
+    const last = formatted[formatted.length - 1];
+    if (last && last.role === m.role) {
+      last.content += "\n" + m.content;
+    } else {
+      formatted.push({ role: m.role, content: m.content });
+    }
+  }
+  if (formatted.length === 0) {
+    const lastMsg = messages[messages.length - 1]?.content ?? "Hello";
+    return [{ role: "user" as const, content: lastMsg }];
+  }
+  return formatted;
+}
+
 export async function POST(req: NextRequest) {
   const geminiKey = process.env.GEMINI_API_KEY;
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
@@ -61,8 +110,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No messages provided." }, { status: 400 });
     }
 
-    const lastMessage = messages[messages.length - 1]?.content ?? "";
-
     // 1. Try Gemini API first (most efficient & cost-effective)
     if (geminiKey) {
       const genAI = new GoogleGenerativeAI(geminiKey);
@@ -71,13 +118,7 @@ export async function POST(req: NextRequest) {
         systemInstruction: SYSTEM_PROMPT,
       });
 
-      // Format messages history for Gemini
-      // Gemini expects format: { role: 'user'|'model', parts: [{ text: '...' }] }
-      const contents = messages.map((m: { role: "user" | "assistant"; content: string }) => ({
-        role: m.role === "assistant" ? "model" : "user",
-        parts: [{ text: m.content }],
-      }));
-
+      const contents = formatGeminiMessages(messages);
       const result = await model.generateContent({ contents });
       const response = await result.response;
       const text = response.text();
@@ -88,14 +129,12 @@ export async function POST(req: NextRequest) {
     // 2. Fallback to Anthropic API if key is set
     if (anthropicKey) {
       const anthropic = new Anthropic({ apiKey: anthropicKey });
+      const contents = formatAnthropicMessages(messages);
       const response = await anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
         max_tokens: 300,
         system: SYSTEM_PROMPT,
-        messages: messages.map((m: { role: "user" | "assistant"; content: string }) => ({
-          role: m.role,
-          content: m.content,
-        })),
+        messages: contents,
       });
 
       const text = response.content
@@ -107,10 +146,10 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ error: "No configured AI models could be activated." }, { status: 500 });
-  } catch (err) {
-    console.error("Chat API error:", err);
+  } catch (err: any) {
+    console.error("Chat API error details:", err);
     return NextResponse.json(
-      { error: "Something went wrong communicating with the AI. Try again in a moment." },
+      { error: `Chat API failure: ${err?.message || err || "Unknown Error"}` },
       { status: 500 }
     );
   }

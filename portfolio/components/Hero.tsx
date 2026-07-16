@@ -70,7 +70,10 @@ export default function Hero() {
 
         {/* Right Column: Concentric Glowing JARVIS Ring Avatar */}
         <div className="lg:col-span-5 flex flex-col items-center justify-center relative select-none p-4">
-          <div className="relative h-44 w-44 rounded-full border border-cyan-500/10 p-2 flex items-center justify-center bg-slate-950/80 shadow-[0_0_40px_rgba(6,182,212,0.1)] group">
+          <div 
+            onClick={() => window.dispatchEvent(new CustomEvent("jarvis-avatar-click"))}
+            className="relative h-44 w-44 rounded-full border border-cyan-500/10 p-2 flex items-center justify-center bg-slate-950/80 shadow-[0_0_40px_rgba(6,182,212,0.1)] group cursor-pointer"
+          >
             {/* Spinning holographic rings */}
             <div className="absolute -inset-1.5 rounded-full border border-dashed border-cyan-400/40 animate-spin" style={{ animationDuration: "16s" }} />
             <div className="absolute -inset-3.5 rounded-full border border-dashed border-purple-500/20 animate-spin" style={{ animationDuration: "8s", animationDirection: "reverse" }} />
@@ -78,7 +81,7 @@ export default function Hero() {
             <img
               src="/jarvis-avatar.jpg"
               alt="JARVIS Assistant"
-              className="h-full w-full object-cover rounded-full group-hover:scale-105 transition-transform duration-500 animate-pulse"
+              className="h-full w-full object-cover rounded-full group-hover:scale-105 transition-transform duration-500 animate-pulse cursor-pointer"
               style={{ animationDuration: "3s" }}
             />
           </div>

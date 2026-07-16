@@ -25,7 +25,9 @@ const QUICK_COMMANDS = [
 
 export default function JarvisVoiceAssistant({ avatarSrc, name }: JarvisVoiceAssistantProps) {
   const [isListening, setIsListening] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    { role: "assistant", content: "👋 Standby Mode.\n\nClick the JARVIS Avatar on the home page to initialize the voice receptionist tour, or type your question below." }
+  ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(true); // Default to muted to comply with browser autoplay rules
@@ -70,54 +72,92 @@ export default function JarvisVoiceAssistant({ avatarSrc, name }: JarvisVoiceAss
     chatScrollRef.current?.scrollTo({ top: chatScrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  // Load chat history & referral detection & proactive introduction trigger
+  // Load chat history & referral detection
   useEffect(() => {
     const history = sessionStorage.getItem("jarvis_chat_history");
     if (history) {
       setMessages(JSON.parse(history));
     }
 
-    // Detect referral source
     let referralText = "direct link";
-    let customizedWelcome = "";
-    
     if (typeof document !== "undefined") {
       const ref = document.referrer.toLowerCase();
-      if (ref.includes("linkedin")) {
-        referralText = "LinkedIn";
-        customizedWelcome = "Welcome! I noticed you're visiting Harshit's portfolio from LinkedIn. I will give you a quick overview of his professional engineering background.";
-      } else if (ref.includes("github")) {
-        referralText = "GitHub";
-        customizedWelcome = "Welcome! Since you're coming from GitHub, I'll start by focusing on Harshit's best full-stack and agentic development projects.";
-      }
+      if (ref.includes("linkedin")) referralText = "LinkedIn";
+      else if (ref.includes("github")) referralText = "GitHub";
     }
-    
     if (typeof window !== "undefined" && window.innerWidth < 768) {
       referralText = `${referralText} (Mobile)`;
-      customizedWelcome = "Welcome! You're viewing the mobile version of the portfolio. I'll keep the autonomic tour brief and focused.";
     }
 
-    setAgentThought(`Referral detected: ${referralText}. Formulating custom welcoming plan...`);
-    logAction(`Referral detected: ${referralText}`);
+    setAgentThought(`Systems standby. Click the robot avatar to boot receptionist tour.`);
+    logAction(`Standby referral detected: ${referralText}`);
+  }, []);
 
-    const startOrQueueTour = () => {
+  // Listen for avatar click trigger
+  useEffect(() => {
+    const handleAvatarClick = () => {
       setIsMuted(false);
-      startPortfolioTour(customizedWelcome);
+      setTourStep(0);
+      setAgentStatus("PLANNING");
+      setAgentThought("Initializing system boot protocols. Loading core metrics.");
+      logAction("System Boot initiated");
+
+      const bootLogs = [
+        "Initializing JARVIS v2.0 Core Interface...",
+        "⚡ Voice Engine: ONLINE",
+        "🧠 Dialogue Memory Registers: LOADED",
+        "📂 Portfolio Knowledge Indexes: LOADED",
+        "🚀 Navigation Systems: STANDBY",
+        "🤖 AI Receptionist Co-pilot: ACTIVE"
+      ];
+
+      setMessages([]);
+      let logIndex = 0;
+
+      const printLog = () => {
+        if (logIndex < bootLogs.length) {
+          setMessages((prev) => [...prev, { role: "assistant", content: `[BOOT] ${bootLogs[logIndex]}` }]);
+          logAction(bootLogs[logIndex]);
+          logIndex++;
+          setTimeout(printLog, 300);
+        } else {
+          startSpokenIntro();
+        }
+      };
+
+      printLog();
     };
 
-    // Always start the Auto Portfolio Tour after boot sequence unmounts on reload/visit
-    const timer = setTimeout(() => {
-      startOrQueueTour();
+    const startSpokenIntro = () => {
+      setAgentStatus("GUIDING TOUR");
+      setAgentThought("Guiding visitor. Playing introduction speech sequence.");
       
-      // Fallback: If browser blocks audio autoplay, capture first click gesture anywhere to resume tour voice
-      const handleGesture = () => {
-        setIsMuted(false);
-        document.removeEventListener("click", handleGesture);
-      };
-      document.addEventListener("click", handleGesture);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
+      const phrases = [
+        "Hello.",
+        "Welcome to Harshit Gupta's portfolio.",
+        "I am JARVIS.",
+        "Harshit's autonomous AI assistant.",
+        "I can explain his projects.",
+        "Show his skills.",
+        "Download his resume.",
+        "And answer any questions you have.",
+        "Let me take you on a quick tour of his work."
+      ];
+
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: `🎙️ **[JARVIS INTRODUCTION]**\n\n${phrases.join(" ")}` }
+      ]);
+
+      speakSequential(phrases, () => {
+        // Once speech finishes, trigger scroll tour step 1
+        runTourStep1();
+      });
+    };
+
+    window.addEventListener("jarvis-avatar-click", handleAvatarClick);
+    return () => window.removeEventListener("jarvis-avatar-click", handleAvatarClick);
+  }, [isMuted]);
 
   // Listen for auto-explaining project events
   useEffect(() => {
@@ -221,6 +261,47 @@ export default function JarvisVoiceAssistant({ avatarSrc, name }: JarvisVoiceAss
       }
     }
   }, [messages, hiringStep, hiringData, tourStep]);
+
+  const speakSequential = (phrases: string[], onDone: () => void) => {
+    if (isMuted) {
+      onDone();
+      return;
+    }
+    let idx = 0;
+    const speakNext = () => {
+      if (idx >= phrases.length) {
+        onDone();
+        return;
+      }
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        const utterance = new SpeechSynthesisUtterance(phrases[idx]);
+        const voices = window.speechSynthesis.getVoices();
+        const preferred = voices.find(
+          (v) =>
+            v.name.includes("Male") ||
+            v.name.includes("Google UK English Male") ||
+            v.name.includes("David")
+        );
+        if (preferred) utterance.voice = preferred;
+        utterance.rate = 1.02;
+        utterance.pitch = 0.95;
+        
+        utterance.onend = () => {
+          idx++;
+          setTimeout(speakNext, 300);
+        };
+        utterance.onerror = () => {
+          idx++;
+          setTimeout(speakNext, 300);
+        };
+        window.speechSynthesis.speak(utterance);
+      } else {
+        idx++;
+        speakNext();
+      }
+    };
+    speakNext();
+  };
 
   // Text-To-Speech (TTS)
   const speak = (text: string, onEndCallback?: () => void) => {
@@ -379,7 +460,16 @@ export default function JarvisVoiceAssistant({ avatarSrc, name }: JarvisVoiceAss
     const text = "That concludes the autonomous overview. I have unlocked the quick commands panel below. You can ask me questions about his projects, download his resume directly, or say 'Contact Harshit' to schedule an interview. How would you like to proceed?";
 
     setMessages((m) => [...m, { role: "assistant", content: `🎙️ **[TOUR COMPLETE]**\n\n${text}` }]);
-    speak(text);
+    
+    speak(text, () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.start();
+        } catch (e) {
+          console.warn("Speech recognition already running", e);
+        }
+      }
+    });
     
     setTourStep(-1); // Reset back to idle mode
     setAgentStatus("READY");
