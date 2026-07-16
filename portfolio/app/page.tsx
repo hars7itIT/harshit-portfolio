@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
+import FeaturedProjects from "@/components/FeaturedProjects";
 import TerminalLoader from "@/components/TerminalLoader";
 import ParticleBackground from "@/components/ParticleBackground";
 import About from "@/components/About";
@@ -152,43 +153,7 @@ export default function Home() {
           {/* Left/Center Column (Content Scroll) */}
           <div className="lg:col-span-8 space-y-16">
             <Hero />
-            
-            {/* Holographic JARVIS Online Indicator Card */}
-            <div className="rounded-2xl border border-line bg-surface/10 backdrop-blur-sm p-6 flex flex-col sm:flex-row items-center gap-6 justify-between relative overflow-hidden group hover:border-cyan-500/10 transition-all select-none">
-              
-              {/* Glowing Corner Accents */}
-              <div className="absolute top-0 left-0 h-2 w-2 border-t border-l border-cyan-400/50" />
-              <div className="absolute top-0 right-0 h-2 w-2 border-t border-r border-cyan-400/50" />
-              <div className="absolute bottom-0 left-0 h-2 w-2 border-b border-l border-cyan-400/50" />
-              <div className="absolute bottom-0 right-0 h-2 w-2 border-b border-r border-cyan-400/50" />
-
-              <div className="flex items-center gap-4 text-center sm:text-left flex-col sm:flex-row">
-                {/* Holographic avatar ring wrapper */}
-                <div className="relative h-16 w-16 rounded-full border border-cyan-500/20 p-1 flex items-center justify-center bg-slate-950/80 shrink-0">
-                  <div className="absolute -inset-1 rounded-full border border-dashed border-cyan-400/30 animate-spin" style={{ animationDuration: "12s" }} />
-                  <div className="absolute -inset-2 rounded-full border border-dashed border-purple-400/15 animate-spin" style={{ animationDuration: "6s", animationDirection: "reverse" }} />
-                  <img
-                    src="/profile.jpg"
-                    alt="Harshit Gupta"
-                    className="h-full w-full object-cover rounded-full grayscale brightness-95 group-hover:grayscale-0 transition-all duration-500"
-                  />
-                </div>
-                <div>
-                  <h4 className="font-mono text-sm font-bold text-text uppercase tracking-widest flex items-center gap-1.5 justify-center sm:justify-start">
-                    <span>JARVIS</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping" />
-                  </h4>
-                  <p className="font-mono text-[10px] text-muted uppercase mt-0.5 tracking-wider">
-                    AI Portfolio Assistant • <span className="text-cyan-400">Online & Secured</span>
-                  </p>
-                </div>
-              </div>
-
-              <div className="text-center sm:text-right">
-                <span className="font-mono text-[9px] text-muted block uppercase">cognitive load</span>
-                <span className="font-mono text-xs font-bold text-cyan-400 tracking-widest">14.8% IDLE</span>
-              </div>
-            </div>
+            <FeaturedProjects />
 
             <About />
             <Skills />
