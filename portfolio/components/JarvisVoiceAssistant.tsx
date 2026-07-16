@@ -100,11 +100,22 @@ export default function JarvisVoiceAssistant({ avatarSrc, name }: JarvisVoiceAss
     setAgentThought(`Referral detected: ${referralText}. Formulating custom welcoming plan...`);
     logAction(`Referral detected: ${referralText}`);
 
+    const startOrQueueTour = () => {
+      setIsMuted(false);
+      startPortfolioTour(customizedWelcome);
+    };
+
     // If no history exists, start the Auto Portfolio Tour after boot sequence unmounts
     if (!history) {
       const timer = setTimeout(() => {
-        setIsMuted(false); // Enable voice automatically for the tour (will try to speak)
-        startPortfolioTour(customizedWelcome);
+        startOrQueueTour();
+        
+        // Fallback: If browser blocks audio autoplay, capture first click gesture anywhere to resume tour voice
+        const handleGesture = () => {
+          setIsMuted(false);
+          document.removeEventListener("click", handleGesture);
+        };
+        document.addEventListener("click", handleGesture);
       }, 3000);
       return () => clearTimeout(timer);
     }

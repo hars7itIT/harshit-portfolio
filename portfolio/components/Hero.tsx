@@ -76,9 +76,10 @@ export default function Hero() {
             <div className="absolute -inset-3.5 rounded-full border border-dashed border-purple-500/20 animate-spin" style={{ animationDuration: "8s", animationDirection: "reverse" }} />
             
             <img
-              src="/profile.jpg"
-              alt="Harshit Gupta"
-              className="h-full w-full object-cover rounded-full grayscale group-hover:grayscale-0 transition-all duration-500"
+              src="/jarvis-avatar.jpg"
+              alt="JARVIS Assistant"
+              className="h-full w-full object-cover rounded-full group-hover:scale-105 transition-transform duration-500 animate-pulse"
+              style={{ animationDuration: "3s" }}
             />
           </div>
 
