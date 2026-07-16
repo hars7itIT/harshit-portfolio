@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import FeaturedProjects from "@/components/FeaturedProjects";
@@ -15,7 +16,7 @@ import Achievements from "@/components/Achievements";
 import CodingProfiles from "@/components/CodingProfiles";
 import Contact from "@/components/Contact";
 import JarvisVoiceAssistant from "@/components/JarvisVoiceAssistant";
-import { Home as HomeIcon, User, Code2, Briefcase, GraduationCap, Trophy, Mail, Github, Linkedin, MessageSquareCode } from "lucide-react";
+import { Home as HomeIcon, User, Code2, Briefcase, GraduationCap, Trophy, Mail, Github, Linkedin, MessageSquareCode, Sparkles, BookOpen } from "lucide-react";
 import { socialLinks } from "@/data/profiles";
 
 const SIDEBAR_ITEMS = [
@@ -113,6 +114,32 @@ export default function Home() {
               </button>
             );
           })}
+
+          <div className="h-[1px] w-6 bg-cyan-500/10 my-1" />
+
+          {/* AI Tools Link */}
+          <Link
+            href="/ai"
+            className="relative p-2 rounded-xl border bg-transparent border-transparent text-muted hover:text-cyan-400 hover:bg-white/5 group/item transition-all duration-300"
+            title="AI Tools"
+          >
+            <Sparkles size={16} className="text-cyan-400/80 animate-pulse" />
+            <span className="absolute left-14 top-1/2 -translate-y-1/2 ml-2 p-1.5 px-2.5 rounded-lg bg-ink border border-line text-[10px] font-mono font-bold uppercase tracking-widest text-cyan-400 opacity-0 pointer-events-none group-hover/item:opacity-100 transition-opacity z-50 shadow-xl whitespace-nowrap">
+              AI Tools
+            </span>
+          </Link>
+
+          {/* Blog Link */}
+          <Link
+            href="/blog"
+            className="relative p-2 rounded-xl border bg-transparent border-transparent text-muted hover:text-purple-400 hover:bg-white/5 group/item transition-all duration-300"
+            title="Blog"
+          >
+            <BookOpen size={16} className="text-purple-400/80" />
+            <span className="absolute left-14 top-1/2 -translate-y-1/2 ml-2 p-1.5 px-2.5 rounded-lg bg-ink border border-line text-[10px] font-mono font-bold uppercase tracking-widest text-purple-400 opacity-0 pointer-events-none group-hover/item:opacity-100 transition-opacity z-50 shadow-xl whitespace-nowrap">
+              Blog
+            </span>
+          </Link>
         </nav>
 
         {/* Bottom Social Icons */}

@@ -103,6 +103,18 @@ export default function Nav() {
               </a>
             </li>
           ))}
+          <li>
+            <Link href="/ai" className="nav-btn flex items-center gap-1 text-cyan-400 hover:text-cyan-300">
+              <Sparkles size={11} className="animate-pulse" />
+              <span>AI Tools</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/blog" className="nav-btn flex items-center gap-1 text-purple-400 hover:text-purple-300">
+              <BookOpen size={11} />
+              <span>Blog</span>
+            </Link>
+          </li>
         </ul>
 
         {/* Action Widgets */}
