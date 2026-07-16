@@ -93,82 +93,80 @@ export default function JarvisVoiceAssistant({ avatarSrc, name }: JarvisVoiceAss
     logAction(`Standby referral detected: ${referralText}`);
   }, []);
 
-  // Listen for avatar click trigger
-  useEffect(() => {
-    const handleAvatarClick = () => {
-      setIsMuted(false);
-      setTourStep(0);
-      setAgentStatus("PLANNING");
-      setAgentThought("Initializing system boot protocols. Loading core metrics.");
-      logAction("System Boot initiated");
+  // Listeners refs to avoid stale closures in event handlers
+  const handleAvatarClickRef = useRef<() => void>();
+  const handleProjectExplainRef = useRef<(e: Event) => void>();
+  const handleBehaviorRef = useRef<(e: Event) => void>();
 
-      const bootLogs = [
-        "Initializing JARVIS v2.0 Core Interface...",
-        "⚡ Voice Engine: ONLINE",
-        "🧠 Dialogue Memory Registers: LOADED",
-        "📂 Portfolio Knowledge Indexes: LOADED",
-        "🚀 Navigation Systems: STANDBY",
-        "🤖 AI Receptionist Co-pilot: ACTIVE"
-      ];
+  // Assign latest state/methods to refs on every render
+  handleAvatarClickRef.current = () => {
+    setIsMuted(false);
+    setTourStep(0);
+    setAgentStatus("PLANNING");
+    setAgentThought("Initializing system boot protocols. Loading core metrics.");
+    logAction("System Boot initiated");
 
-      setMessages([]);
-      let logIndex = 0;
+    const bootLogs = [
+      "Initializing JARVIS v2.0 Core Interface...",
+      "⚡ Voice Engine: ONLINE",
+      "🧠 Dialogue Memory Registers: LOADED",
+      "📂 Portfolio Knowledge Indexes: LOADED",
+      "🚀 Navigation Systems: STANDBY",
+      "🤖 AI Receptionist Co-pilot: ACTIVE"
+    ];
 
-      const printLog = () => {
-        if (logIndex < bootLogs.length) {
-          setMessages((prev) => [...prev, { role: "assistant", content: `[BOOT] ${bootLogs[logIndex]}` }]);
-          logAction(bootLogs[logIndex]);
-          logIndex++;
-          setTimeout(printLog, 300);
-        } else {
-          startSpokenIntro();
-        }
-      };
+    setMessages([]);
+    let logIndex = 0;
 
-      printLog();
+    const printLog = () => {
+      if (logIndex < bootLogs.length) {
+        setMessages((prev) => [...prev, { role: "assistant", content: `[BOOT] ${bootLogs[logIndex]}` }]);
+        logAction(bootLogs[logIndex]);
+        logIndex++;
+        setTimeout(printLog, 300);
+      } else {
+        startSpokenIntro();
+      }
     };
 
-    const startSpokenIntro = () => {
-      setAgentStatus("GUIDING TOUR");
-      setAgentThought("Guiding visitor. Playing introduction speech sequence.");
-      
-      const phrases = [
-        "Hello.",
-        "Welcome to Harshit Gupta's portfolio.",
-        "I am JARVIS.",
-        "Harshit's autonomous AI assistant.",
-        "I can explain his projects.",
-        "Show his skills.",
-        "Download his resume.",
-        "And answer any questions you have.",
-        "Let me take you on a quick tour of his work."
-      ];
+    printLog();
+  };
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: `🎙️ **[JARVIS INTRODUCTION]**\n\n${phrases.join(" ")}` }
-      ]);
+  const startSpokenIntro = () => {
+    setAgentStatus("GUIDING TOUR");
+    setAgentThought("Guiding visitor. Playing introduction speech sequence.");
+    
+    const phrases = [
+      "Hello.",
+      "Welcome to Harshit Gupta's portfolio.",
+      "I am JARVIS.",
+      "Harshit's autonomous AI assistant.",
+      "I can explain his projects.",
+      "Show his skills.",
+      "Download his resume.",
+      "And answer any questions you have.",
+      "Let me take you on a quick tour of his work."
+    ];
 
-      speakSequential(phrases, () => {
-        // Once speech finishes, trigger scroll tour step 1
-        runTourStep1();
-      });
-    };
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: `🎙️ **[JARVIS INTRODUCTION]**\n\n${phrases.join(" ")}` }
+    ]);
 
-    window.addEventListener("jarvis-avatar-click", handleAvatarClick);
-    return () => window.removeEventListener("jarvis-avatar-click", handleAvatarClick);
-  }, [isMuted]);
+    speakSequential(phrases, () => {
+      // Once speech finishes, trigger scroll tour step 1
+      runTourStep1();
+    });
+  };
 
-  // Listen for auto-explaining project events
-  useEffect(() => {
-    const handleProjectExplain = (e: Event) => {
-      const project = (e as CustomEvent).detail;
-      setAgentStatus("EXECUTING");
-      setAgentThought(`Explaining project node: ${project.name}. Reading stack metrics.`);
-      logAction(`Opened file ${project.name}`);
+  handleProjectExplainRef.current = (e: Event) => {
+    const project = (e as CustomEvent).detail;
+    setAgentStatus("EXECUTING");
+    setAgentThought(`Explaining project node: ${project.name}. Reading stack metrics.`);
+    logAction(`Opened file ${project.name}`);
 
-      const explanationText = `📁 Loading database entry for ${project.name}:
-      
+    const explanationText = `📁 Loading database entry for ${project.name}:
+    
 • Category: ${project.category}
 • Tech Stack: ${project.stack.join(", ")}
 • Key Features: ${project.features.join(", ")}
@@ -176,49 +174,56 @@ export default function JarvisVoiceAssistant({ avatarSrc, name }: JarvisVoiceAss
 • Challenge: ${project.challenges[0]}
 • Solution: ${project.solutions[0]}`;
 
+    setMessages((m) => {
+      const next = [...m, { role: "assistant" as const, content: explanationText }];
+      sessionStorage.setItem("jarvis_chat_history", JSON.stringify(next));
+      return next;
+    });
+    speak(`Loaded details for project ${project.name}. It is built with ${project.stack[0]}.`);
+    setAgentStatus("READY");
+  };
+
+  handleBehaviorRef.current = (e: Event) => {
+    const sectionId = (e as CustomEvent).detail;
+    setAgentThought(`Visitor scrolled to [${sectionId}]. Auditing recruiter interest...`);
+    logAction(`Viewed section: ${sectionId}`);
+
+    let proactiveText = "";
+    if (sectionId === "skills") {
+      proactiveText = "I see you are inspecting Harshit's skills database. He has stable proficiency in TypeScript, C++, React, and AI-agent integrations.";
+    } else if (sectionId === "education") {
+      proactiveText = "Harshit is currently in his second year studying Computer Science at Panjab University, Chandigarh.";
+    } else if (sectionId === "experience") {
+      proactiveText = "Exploring experience timeline. Harshit has shipped dynamic projects like WomenHealthCare and diagnostic engines like FixIQ.";
+    }
+
+    if (proactiveText && tourStep === -1) { // Only do scroll proactive chat inserts if not currently in tour
       setMessages((m) => {
-        const next = [...m, { role: "assistant" as const, content: explanationText }];
+        if (m[m.length - 1]?.content === proactiveText) return m;
+        const next = [...m, { role: "assistant" as const, content: `[Proactive Agent] ${proactiveText}` }];
         sessionStorage.setItem("jarvis_chat_history", JSON.stringify(next));
         return next;
       });
-      speak(`Loaded details for project ${project.name}. It is built with ${project.stack[0]}.`);
-      setAgentStatus("READY");
-    };
+      speak(proactiveText);
+    }
+  };
 
-    window.addEventListener("jarvis-explain-project", handleProjectExplain);
-    return () => window.removeEventListener("jarvis-explain-project", handleProjectExplain);
-  }, [isMuted]);
-
-  // Listen for behavioral tracking events (proactive HUD updates based on scroll)
+  // Mount stable event listeners delegating to refs
   useEffect(() => {
-    const handleBehavior = (e: Event) => {
-      const sectionId = (e as CustomEvent).detail;
-      setAgentThought(`Visitor scrolled to [${sectionId}]. Auditing recruiter interest...`);
-      logAction(`Viewed section: ${sectionId}`);
+    const avatarListener = () => handleAvatarClickRef.current?.();
+    const projectListener = (e: Event) => handleProjectExplainRef.current?.(e);
+    const behaviorListener = (e: Event) => handleBehaviorRef.current?.(e);
 
-      let proactiveText = "";
-      if (sectionId === "skills") {
-        proactiveText = "I see you are inspecting Harshit's skills database. He has stable proficiency in TypeScript, C++, React, and AI-agent integrations.";
-      } else if (sectionId === "education") {
-        proactiveText = "Harshit is currently in his second year studying Computer Science at Panjab University, Chandigarh.";
-      } else if (sectionId === "experience") {
-        proactiveText = "Exploring experience timeline. Harshit has shipped dynamic projects like WomenHealthCare and diagnostic engines like FixIQ.";
-      }
+    window.addEventListener("jarvis-avatar-click", avatarListener);
+    window.addEventListener("jarvis-explain-project", projectListener);
+    window.addEventListener("jarvis-behavior-tracked", behaviorListener);
 
-      if (proactiveText && tourStep === -1) { // Only do scroll proactive chat inserts if not currently in tour
-        setMessages((m) => {
-          if (m[m.length - 1]?.content === proactiveText) return m;
-          const next = [...m, { role: "assistant" as const, content: `[Proactive Agent] ${proactiveText}` }];
-          sessionStorage.setItem("jarvis_chat_history", JSON.stringify(next));
-          return next;
-        });
-        speak(proactiveText);
-      }
+    return () => {
+      window.removeEventListener("jarvis-avatar-click", avatarListener);
+      window.removeEventListener("jarvis-explain-project", projectListener);
+      window.removeEventListener("jarvis-behavior-tracked", behaviorListener);
     };
-
-    window.addEventListener("jarvis-behavior-tracked", handleBehavior);
-    return () => window.removeEventListener("jarvis-behavior-tracked", handleBehavior);
-  }, [isMuted, tourStep]);
+  }, []);
 
   // Speech Recognition Setup
   useEffect(() => {
