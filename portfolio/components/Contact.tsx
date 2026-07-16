@@ -109,6 +109,13 @@ export default function Contact() {
         </form>
 
         <div className="space-y-3">
+          <div className="rounded-xl border border-line bg-surface/40 p-5 font-mono">
+            <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              Direct Connection
+            </h3>
+            <p className="mt-2 text-xs text-text leading-relaxed">Have a question? Feel free to contact me directly.</p>
+          </div>
           <a href={`mailto:${socialLinks.email}`} className="flex items-center gap-3 rounded-md border border-line bg-surface/60 p-4 hover:border-signal">
             <Mail size={16} className="text-signal" />
             <span className="font-mono text-sm text-text">{socialLinks.email}</span>

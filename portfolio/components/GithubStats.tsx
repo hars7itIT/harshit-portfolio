@@ -62,7 +62,7 @@ export default function GithubStats() {
 
   if (isPlaceholder) {
     return (
-      <div className="rounded-xl border border-dashed border-white/10 bg-slate-950/20 p-5 font-mono text-xs text-slate-500 text-center">
+      <div className="rounded-xl border border-dashed border-line bg-surface/20 p-5 font-mono text-xs text-muted text-center">
         Configure a real GitHub handle in <span className="text-cyan-400">data/profiles.ts</span> to sync live metrics.
       </div>
     );
@@ -70,7 +70,7 @@ export default function GithubStats() {
 
   if (error) {
     return (
-      <div className="rounded-xl border border-white/5 bg-slate-950/20 p-5 font-mono text-xs text-slate-500 text-center">
+      <div className="rounded-xl border border-line bg-surface/20 p-5 font-mono text-xs text-muted text-center">
         GitHub integration currently offline. Refresh to try again.
       </div>
     );
@@ -94,7 +94,7 @@ export default function GithubStats() {
           return (
             <div key={s.label} className="glass-card p-5 text-center flex flex-col items-center justify-center relative overflow-hidden group">
               <Icon size={16} className={`${s.color} mb-3 group-hover:scale-110 transition-transform`} />
-              <p className="font-mono text-2xl font-black text-white">
+              <p className="font-mono text-2xl font-black text-text">
                 {s.value !== undefined ? s.value : "···"}
               </p>
               <p className="mt-2 font-mono text-[9px] uppercase tracking-wider text-slate-500 font-bold">{s.label}</p>

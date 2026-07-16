@@ -29,15 +29,15 @@ export default function CodingProfiles() {
                 <span className="font-mono text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-1">
                   PLATFORM NODE
                 </span>
-                <h3 className="text-sm font-bold text-white group-hover:text-cyan-400 transition-colors">
+                <h3 className="text-sm font-bold text-text group-hover:text-cyan-400 transition-colors">
                   {p.name}
                 </h3>
-                <p className="mt-2 font-mono text-xs text-slate-400">
+                <p className="mt-2 font-mono text-xs text-muted">
                   @{p.username}
                 </p>
               </div>
 
-              <div className="mt-5 flex items-center justify-end border-t border-white/5 pt-3">
+              <div className="mt-5 flex items-center justify-end border-t border-line pt-3">
                 <span className="font-mono text-[9px] text-slate-500 group-hover:text-cyan-400 transition-colors flex items-center gap-1">
                   CONNECT <ArrowUpRight size={10} />
                 </span>

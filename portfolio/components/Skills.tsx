@@ -37,10 +37,10 @@ export default function Skills() {
               className="glass-card group overflow-hidden"
             >
               {/* Card Title / Tab Header */}
-              <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.01] px-5 py-3">
+              <div className="flex items-center justify-between border-b border-line bg-surface/10 px-5 py-3">
                 <div className="flex items-center gap-2">
                   <Icon className="h-4 w-4 text-cyan-400 group-hover:animate-pulse" />
-                  <span className="font-mono text-xs font-bold text-white tracking-wide">{group.label}</span>
+                  <span className="font-mono text-xs font-bold text-text tracking-wide">{group.label}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-cyan-500/50" />
@@ -51,7 +51,7 @@ export default function Skills() {
               {/* Skills List */}
               <ul className="p-5 space-y-2.5">
                 {group.items.map((item) => (
-                  <li key={item} className="flex items-center justify-between font-mono text-xs text-slate-300 group-hover:text-white transition-colors">
+                  <li key={item} className="flex items-center justify-between font-mono text-xs text-muted group-hover:text-text transition-colors">
                     <span className="flex items-center gap-2">
                       <span className="h-1 w-1 rounded-full bg-cyan-400 shadow-[0_0_4px_rgba(6,182,212,0.8)]" />
                       {item}
