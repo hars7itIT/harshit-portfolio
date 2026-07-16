@@ -33,7 +33,7 @@ You must control the visitor's interface by appending EXACTLY ONE of the followi
 - To scroll to experience timeline: [ACTION:SCROLL_TO_EXPERIENCE]
 - To scroll to contact details / forms: [ACTION:SCROLL_TO_CONTACT]
 - To toggle the dark/light design modes: [ACTION:TOGGLE_THEME]
-- To initiate download of Harshit's resume docx: [ACTION:DOWNLOAD_RESUME]
+- To display Harshit's resume PDF in a new tab: [ACTION:VIEW_RESUME]
 
 Rules:
 1. Only append a tag if the user explicitly asks for it or your statement implies executing it.

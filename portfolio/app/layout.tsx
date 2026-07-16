@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Instrument_Sans, Bricolage_Grotesque } from "next/font/google";
+import { JetBrains_Mono, Instrument_Sans, Bricolage_Grotesque, Orbitron, Rajdhani, Audiowide } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -29,6 +29,27 @@ const bricolage = Bricolage_Grotesque({
   display: "swap",
 });
 
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  weight: ["400", "500", "700", "900"],
+  variable: "--font-orbitron",
+  display: "swap",
+});
+
+const rajdhani = Rajdhani({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-rajdhani",
+  display: "swap",
+});
+
+const audiowide = Audiowide({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-audiowide",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://harshitgupta.dev"),
   title: "Harshit Gupta — CSE Student & Full-Stack / AI Engineer",
@@ -48,6 +69,7 @@ export const metadata: Metadata = {
     description:
       "Building full-stack and AI-powered software. Explore projects, skills, and the journey so far.",
     type: "website",
+    images: "/profile.jpg"
   },
   twitter: {
     card: "summary_large_image",
@@ -61,7 +83,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${jetbrains.variable} ${instrument.variable} ${bricolage.variable}`}>
+    <html lang="en" className={`${jetbrains.variable} ${instrument.variable} ${bricolage.variable} ${orbitron.variable} ${rajdhani.variable} ${audiowide.variable}`}>
       <body className="font-sans antialiased">
         <ThemeInit />
         <Tracker />

@@ -153,8 +153,9 @@ export default function Nav() {
                   <ArrowUpRight size={10} />
                 </a>
                 <a
-                  href="/Harshit_Gupta_Resume.docx"
-                  download
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center justify-between p-2 rounded-lg text-muted hover:text-text hover:bg-white/5 transition-all"
                 >
                   <span className="flex items-center gap-2"><FileText size={12} className="text-pink-400" /> Resume</span>

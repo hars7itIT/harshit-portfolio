@@ -57,7 +57,7 @@ export default function Projects() {
       />
 
       {/* Holographic Finder Container */}
-      <div className="mt-12 rounded-2xl border border-line bg-surface/40 backdrop-blur-md overflow-hidden shadow-2xl grid lg:grid-cols-12 min-h-[500px] relative">
+      <div className="mt-12 rounded-2xl border border-line bg-surface/40 backdrop-blur-md overflow-hidden shadow-2xl grid lg:grid-cols-12 min-h-[560px] relative group hover:border-cyan-500/20 transition-all duration-300">
         
         {/* Tech Corner Brackets */}
         <div className="absolute top-0 left-0 h-2 w-2 border-t border-l border-cyan-400" />
@@ -112,7 +112,7 @@ export default function Projects() {
         </div>
 
         {/* 2. File List (Folder Contents) */}
-        <div className="lg:col-span-4 border-r border-line p-4 space-y-3 max-h-[500px] overflow-y-auto custom-scroll">
+        <div className="lg:col-span-4 border-r border-line p-4 space-y-3 max-h-[560px] overflow-y-auto custom-scroll">
           <span className="font-mono text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-1">
             Contents: {selectedCategory === "All" ? "root" : selectedCategory.toLowerCase().replace(/\s+/g, "-")}
           </span>
@@ -153,7 +153,7 @@ export default function Projects() {
         </div>
 
         {/* 3. Preview Pane (Inspector Layout) */}
-        <div className="lg:col-span-5 p-5 flex flex-col justify-between max-h-[500px] overflow-y-auto custom-scroll">
+        <div className="lg:col-span-5 p-5 flex flex-col justify-between max-h-[560px] overflow-y-auto custom-scroll">
           <AnimatePresence mode="wait">
             {selectedProject ? (
               <motion.div
@@ -169,6 +169,7 @@ export default function Projects() {
                   <div className="border-b border-line pb-4">
                     <h3 className="text-xl font-bold text-text flex items-center gap-2">
                       {selectedProject.name}
+                      <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
                     </h3>
                     <p className="text-xs text-cyan-400 font-mono mt-1 uppercase tracking-wider">
                       Type: {selectedProject.category} // {selectedProject.status}

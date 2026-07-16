@@ -2,21 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import FeaturedProjects from "@/components/FeaturedProjects";
 import TerminalLoader from "@/components/TerminalLoader";
 import ParticleBackground from "@/components/ParticleBackground";
 import About from "@/components/About";
-import Education from "@/components/Education";
 import Skills from "@/components/Skills";
 import Experience from "@/components/Experience";
 import Projects from "@/components/Projects";
-import Achievements from "@/components/Achievements";
-import CodingProfiles from "@/components/CodingProfiles";
+import AcademicCredentials from "@/components/AcademicCredentials";
 import Contact from "@/components/Contact";
 import JarvisVoiceAssistant from "@/components/JarvisVoiceAssistant";
-import { Home as HomeIcon, User, Code2, Briefcase, GraduationCap, Trophy, Mail, Github, Linkedin, MessageSquareCode, Sparkles, BookOpen } from "lucide-react";
+import { Home as HomeIcon, User, Code2, Briefcase, GraduationCap, Trophy, Mail, Github, Linkedin, MessageSquareCode, Sparkles, BookOpen, ShieldAlert } from "lucide-react";
 import { socialLinks } from "@/data/profiles";
 
 const SIDEBAR_ITEMS = [
@@ -32,15 +31,42 @@ const SIDEBAR_ITEMS = [
 
 export default function Home() {
   const [activeItem, setActiveItem] = useState("hero");
+  const [activeCredentialsTab, setActiveCredentialsTab] = useState<"education" | "achievements" | "profiles">("education");
+  const [isDockExpanded, setIsDockExpanded] = useState(false);
+
+  // Sound play helper
+  const playBeep = (type: "click" | "hover") => {
+    if (typeof window === "undefined" || !window.AudioContext) return;
+    const savedMute = sessionStorage.getItem("jarvis_muted");
+    if (savedMute === "true") return;
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(type === "click" ? 850 : 1100, ctx.currentTime);
+      gain.gain.setValueAtTime(0.015, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.05);
+    } catch(e) {}
+  };
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPos = window.scrollY + 200;
       
-      // Determine active section for sidebar highlights
       if (scrollPos < (document.getElementById("about")?.offsetTop ?? 9999)) {
         setActiveItem("hero");
       } else {
+        const credsEl = document.getElementById("academic-credentials");
+        if (credsEl && scrollPos >= credsEl.offsetTop && scrollPos < credsEl.offsetTop + credsEl.offsetHeight) {
+          setActiveItem(activeCredentialsTab === "profiles" ? "education" : activeCredentialsTab);
+          return;
+        }
+
         for (let i = SIDEBAR_ITEMS.length - 1; i >= 1; i--) {
           const el = document.getElementById(SIDEBAR_ITEMS[i].id);
           if (el && scrollPos >= el.offsetTop) {
@@ -53,9 +79,8 @@ export default function Home() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [activeCredentialsTab]);
 
-  // Hook: Alert JARVIS about scrolling behavior
   useEffect(() => {
     if (activeItem !== "hero") {
       const event = new CustomEvent("jarvis-behavior-tracked", { detail: activeItem });
@@ -64,8 +89,16 @@ export default function Home() {
   }, [activeItem]);
 
   const handleScrollTo = (id: string) => {
+    playBeep("click");
     if (id === "hero") {
       window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (id === "education" || id === "achievements" || id === "profiles" || id === "coding-profiles") {
+      const tab = id === "coding-profiles" || id === "profiles" ? "profiles" : (id as "education" | "achievements");
+      setActiveCredentialsTab(tab);
+      const el = document.getElementById("academic-credentials");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
     } else {
       const el = document.getElementById(id);
       if (el) {
@@ -80,17 +113,31 @@ export default function Home() {
       <ParticleBackground />
       <Nav />
 
-      {/* Futuristic Left Sidebar (Desktop Only) */}
-      <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 w-16 z-40 border-r border-line bg-ink/40 backdrop-blur-md items-center py-24 justify-between select-none">
-        
-        {/* Top App Icon / Marker */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#06b6d4] animate-pulse" />
-          <div className="h-6 w-[1px] bg-cyan-500/20" />
+      {/* Windows 11 style expanding Left Sidebar Dock */}
+      <aside 
+        onMouseEnter={() => {
+          setIsDockExpanded(true);
+          playBeep("hover");
+        }}
+        onMouseLeave={() => setIsDockExpanded(false)}
+        className={`hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-45 border-r border-line bg-slate-950/70 backdrop-blur-xl items-center py-20 justify-between select-none transition-all duration-300 ${
+          isDockExpanded ? "w-44 px-4" : "w-16 px-0"
+        }`}
+      >
+        {/* Top Dock branding */}
+        <div className="flex flex-col items-center gap-1.5 w-full">
+          <div className="h-6 w-6 rounded bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center text-white text-[11px] font-black shadow-[0_0_10px_rgba(6,182,212,0.3)]">
+            H
+          </div>
+          {isDockExpanded && (
+            <span className="font-mono text-[9px] text-cyan-400 font-bold uppercase tracking-wider mt-1.5 animate-pulse">
+              harshit.sys
+            </span>
+          )}
         </div>
 
-        {/* Mid Navigation Icons */}
-        <nav className="flex flex-col items-center gap-5">
+        {/* Sidebar Navigation links */}
+        <nav className="flex flex-col items-start gap-4 w-full">
           {SIDEBAR_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = activeItem === item.id;
@@ -98,53 +145,69 @@ export default function Home() {
               <button
                 key={item.id}
                 onClick={() => handleScrollTo(item.id)}
-                className={`relative p-2 rounded-xl border transition-all duration-300 group/item cursor-pointer ${
+                onMouseEnter={() => playBeep("hover")}
+                className={`relative w-full p-2.5 rounded-xl border transition-all duration-300 flex items-center cursor-pointer ${
+                  isDockExpanded ? "justify-start" : "justify-center"
+                } ${
                   isActive 
-                    ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.15)] scale-105" 
-                    : "bg-transparent border-transparent text-muted hover:text-cyan-400 hover:bg-white/5"
+                    ? "bg-cyan-500/10 border-cyan-500/35 text-cyan-450 shadow-[0_0_12px_rgba(6,182,212,0.18)]" 
+                    : "bg-transparent border-transparent text-muted hover:text-cyan-450 hover:bg-white/5"
                 }`}
                 title={item.label}
               >
-                <Icon size={16} />
+                <Icon size={14} className={isActive ? "text-cyan-400" : ""} />
                 
-                {/* Floating tooltip */}
-                <span className="absolute left-14 top-1/2 -translate-y-1/2 ml-2 p-1.5 px-2.5 rounded-lg bg-ink border border-line text-[10px] font-mono font-bold uppercase tracking-widest text-cyan-400 opacity-0 pointer-events-none group-hover/item:opacity-100 transition-opacity z-50 shadow-xl whitespace-nowrap">
-                  {item.label}
-                </span>
+                {isDockExpanded && (
+                  <span className={`font-mono text-[9px] font-bold uppercase tracking-widest ml-3 whitespace-nowrap transition-all duration-300 ${
+                    isActive ? "text-cyan-400" : "text-muted"
+                  }`}>
+                    {item.label}
+                  </span>
+                )}
               </button>
             );
           })}
 
-          <div className="h-[1px] w-6 bg-cyan-500/10 my-1" />
+          <div className="h-[1px] w-full bg-cyan-500/15 my-1" />
 
           {/* AI Tools Link */}
           <Link
             href="/ai"
-            className="relative p-2 rounded-xl border bg-transparent border-transparent text-muted hover:text-cyan-400 hover:bg-white/5 group/item transition-all duration-300"
+            onMouseEnter={() => playBeep("hover")}
+            className={`w-full p-2.5 rounded-xl border bg-transparent border-transparent text-muted hover:text-cyan-450 hover:bg-white/5 flex items-center transition-all duration-300 ${
+              isDockExpanded ? "justify-start" : "justify-center"
+            }`}
             title="AI Tools"
           >
-            <Sparkles size={16} className="text-cyan-400/80 animate-pulse" />
-            <span className="absolute left-14 top-1/2 -translate-y-1/2 ml-2 p-1.5 px-2.5 rounded-lg bg-ink border border-line text-[10px] font-mono font-bold uppercase tracking-widest text-cyan-400 opacity-0 pointer-events-none group-hover/item:opacity-100 transition-opacity z-50 shadow-xl whitespace-nowrap">
-              AI Tools
-            </span>
+            <Sparkles size={14} className="text-cyan-400 animate-pulse" />
+            {isDockExpanded && (
+              <span className="font-mono text-[9px] font-bold uppercase tracking-widest ml-3 text-cyan-400">
+                AI Tools
+              </span>
+            )}
           </Link>
 
           {/* Blog Link */}
           <Link
             href="/blog"
-            className="relative p-2 rounded-xl border bg-transparent border-transparent text-muted hover:text-purple-400 hover:bg-white/5 group/item transition-all duration-300"
+            onMouseEnter={() => playBeep("hover")}
+            className={`w-full p-2.5 rounded-xl border bg-transparent border-transparent text-muted hover:text-purple-450 hover:bg-white/5 flex items-center transition-all duration-300 ${
+              isDockExpanded ? "justify-start" : "justify-center"
+            }`}
             title="Blog"
           >
-            <BookOpen size={16} className="text-purple-400/80" />
-            <span className="absolute left-14 top-1/2 -translate-y-1/2 ml-2 p-1.5 px-2.5 rounded-lg bg-ink border border-line text-[10px] font-mono font-bold uppercase tracking-widest text-purple-400 opacity-0 pointer-events-none group-hover/item:opacity-100 transition-opacity z-50 shadow-xl whitespace-nowrap">
-              Blog
-            </span>
+            <BookOpen size={14} className="text-purple-400" />
+            {isDockExpanded && (
+              <span className="font-mono text-[9px] font-bold uppercase tracking-widest ml-3 text-purple-400">
+                Blog
+              </span>
+            )}
           </Link>
         </nav>
 
         {/* Bottom Social Icons */}
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-6 w-[1px] bg-cyan-500/20" />
+        <div className="flex flex-col items-center gap-3.5 w-full">
+          <div className="h-[1px] w-full bg-cyan-500/15" />
           <a
             href={socialLinks.github}
             target="_blank"
@@ -152,7 +215,7 @@ export default function Home() {
             className="text-muted hover:text-purple-400 transition-colors"
             title="GitHub Profile"
           >
-            <Github size={15} />
+            <Github size={13} />
           </a>
           <a
             href={socialLinks.linkedin}
@@ -161,48 +224,113 @@ export default function Home() {
             className="text-muted hover:text-cyan-400 transition-colors"
             title="LinkedIn Profile"
           >
-            <Linkedin size={15} />
-          </a>
-          <a
-            href={`mailto:${socialLinks.email}`}
-            className="text-muted hover:text-emerald-400 transition-colors"
-            title="Send Email"
-          >
-            <Mail size={15} />
+            <Linkedin size={13} />
           </a>
         </div>
       </aside>
 
       {/* Main Container Layout */}
       <div className="mx-auto max-w-7xl px-6 pt-28 pb-16 md:pl-24 relative z-10">
-        <div className="grid gap-8 lg:grid-cols-12 items-start">
-          
-          {/* Left/Center Column (Content Scroll) */}
-          <div className="lg:col-span-8 space-y-16">
-            <Hero />
-            <FeaturedProjects />
+        
+        {/* -----------------------------------------------------------
+            UNIFIED DUBBED CYBERPUNK HUD INTERFACE PANEL
+            ----------------------------------------------------------- */}
+        <div className="relative rounded-3xl border border-cyan-500/15 bg-slate-950/20 shadow-[0_0_60px_rgba(6,182,212,0.06)] p-6 backdrop-blur-md overflow-hidden mb-20 group/hud">
+          {/* Glowing Corner Accents */}
+          <div className="absolute top-0 left-0 h-4 w-4 border-t-2 border-l-2 border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]" />
+          <div className="absolute top-0 right-0 h-4 w-4 border-t-2 border-r-2 border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]" />
+          <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2 border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]" />
+          <div className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]" />
 
-            <About />
-            <Skills />
-            <Projects />
-            <Experience />
-            <Education />
-            <Achievements />
-            <CodingProfiles />
-            <Contact />
+          {/* Sweep scanline overlay animation */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-400/[0.03] to-transparent h-[400px] w-full -translate-y-full animate-scanline pointer-events-none" />
+
+          {/* Interior 3-Column Dashboard Matrix layout */}
+          <div className="grid gap-6 lg:grid-cols-12 items-stretch">
+            <div className="lg:col-span-8">
+              <Hero />
+            </div>
+            <div className="lg:col-span-4">
+              <JarvisVoiceAssistant avatarSrc="/profile.jpg" name="Harshit Gupta" />
+            </div>
           </div>
+        </div>
 
-          {/* Right Column (Sticky JARVIS Agent panel) */}
-          <aside className="lg:col-span-4 lg:sticky lg:top-24 mt-8 lg:mt-0">
-            <JarvisVoiceAssistant avatarSrc="/profile.jpg" name="Harshit Gupta" />
-          </aside>
+        {/* -----------------------------------------------------------
+            SCROLLING PORTFOLIO SECTIONS (With smooth reveal animations)
+            ----------------------------------------------------------- */}
+        <div className="space-y-24">
+          
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <FeaturedProjects />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <About />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Skills />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Projects />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Experience />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <AcademicCredentials activeTab={activeCredentialsTab} setActiveTab={setActiveCredentialsTab} />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Contact />
+          </motion.div>
 
         </div>
+
       </div>
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-line md:pl-16 px-6 py-8 text-center bg-slate-950/40">
-        <p className="font-mono text-[10px] text-muted tracking-wider uppercase">
+        <p className="font-mono text-[9px] text-muted tracking-wider uppercase">
           built by Harshit Gupta · {new Date().getFullYear()} · powered by next.js & tailwind css
         </p>
       </footer>

@@ -20,7 +20,10 @@ const config: Config = {
       },
       fontFamily: {
         mono: ["var(--font-jetbrains)", "monospace"],
-        sans: ["var(--font-inter)", "sans-serif"],
+        sans: ["var(--font-sans)", "sans-serif"],
+        orbitron: ["var(--font-orbitron)", "sans-serif"],
+        rajdhani: ["var(--font-rajdhani)", "sans-serif"],
+        audiowide: ["var(--font-audiowide)", "cursive"],
       },
       keyframes: {
         blink: {

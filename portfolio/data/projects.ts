@@ -43,6 +43,7 @@ export const projects: Project[] = [
       "WCAG 2.2 accessibility adjustments",
     ],
     github: "https://github.com/hars7itIT/WomenHealthCare",
+    demo: "https://womenhealthcare.vercel.app",
   },
   {
     slug: "wanderlust",
@@ -76,6 +77,8 @@ export const projects: Project[] = [
       "Cloudinary for image uploads",
       "Mapbox for location display and search",
     ],
+    github: "https://github.com/hars7itIT/WanderLust",
+    demo: "https://wanderlust-sys.onrender.com",
   },
   {
     slug: "fixiq",
@@ -107,6 +110,8 @@ export const projects: Project[] = [
       "Diagnostic history saved per session",
       "Support for image-based product diagnostics",
     ],
+    github: "https://github.com/hars7itIT/FixIQ",
+    demo: "https://fixiq-sys.vercel.app",
   },
   {
     slug: "uiet-attendance-tracker",
