@@ -118,6 +118,11 @@ export default function Hero() {
     window.open("/Harshit_Gupta_Resume.docx", "_blank");
   };
 
+  const handleAvatarClick = () => {
+    triggerBeep("click");
+    window.dispatchEvent(new CustomEvent("jarvis-avatar-click"));
+  };
+
   return (
     <div className="grid gap-6 lg:grid-cols-12 items-stretch select-none font-mono">
       {/* -----------------------------------------------------------
@@ -381,6 +386,7 @@ export default function Hero() {
 
           {/* Core circular robot avatar container */}
           <div 
+            onClick={handleAvatarClick}
             className={`relative h-28 w-28 rounded-full border p-1 flex items-center justify-center bg-slate-950/90 shadow-[0_0_30px_rgba(6,182,212,0.05)] cursor-pointer select-none z-10 transition-all duration-500 ${
               activeState === "listening"
                 ? "border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.35)] scale-105"
