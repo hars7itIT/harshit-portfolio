@@ -15,7 +15,7 @@ import Projects from "@/components/Projects";
 import AcademicCredentials from "@/components/AcademicCredentials";
 import Contact from "@/components/Contact";
 import JarvisVoiceAssistant from "@/components/JarvisVoiceAssistant";
-import { Home as HomeIcon, User, Code2, Briefcase, GraduationCap, Trophy, Mail, Github, Linkedin, MessageSquareCode, Sparkles, BookOpen, ShieldAlert } from "lucide-react";
+import { Home as HomeIcon, User, Code2, Briefcase, GraduationCap, Trophy, Mail, Github, Linkedin, MessageSquareCode, Sparkles, BookOpen, ChevronRight } from "lucide-react";
 import { socialLinks } from "@/data/profiles";
 
 const SIDEBAR_ITEMS = [
@@ -120,15 +120,16 @@ export default function Home() {
           playBeep("hover");
         }}
         onMouseLeave={() => setIsDockExpanded(false)}
-        className={`hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-45 border-r border-line bg-slate-950/70 backdrop-blur-xl items-center py-20 justify-between select-none transition-all duration-300 ${
+        className={`hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-45 border-r border-line bg-slate-950/70 backdrop-blur-xl items-center py-20 justify-between select-none transition-all duration-300 ${
           isDockExpanded ? "w-44 px-4" : "w-16 px-0"
         }`}
       >
         {/* Top Dock branding */}
         <div className="flex flex-col items-center gap-1.5 w-full">
-          <div className="h-6 w-6 rounded bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center text-white text-[11px] font-black shadow-[0_0_10px_rgba(6,182,212,0.3)]">
-            H
-          </div>
+          <svg viewBox="0 0 100 100" className="h-5 w-5 text-cyan-400 animate-pulse">
+            <polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="none" stroke="currentColor" strokeWidth="8" />
+            <text x="50" y="58" textAnchor="middle" dominantBaseline="middle" className="font-sans font-black text-[38px] fill-current">H</text>
+          </svg>
           {isDockExpanded && (
             <span className="font-mono text-[9px] text-cyan-400 font-bold uppercase tracking-wider mt-1.5 animate-pulse">
               harshit.sys
@@ -230,7 +231,7 @@ export default function Home() {
       </aside>
 
       {/* Main Container Layout */}
-      <div className="mx-auto max-w-7xl px-6 pt-28 pb-16 md:pl-24 relative z-10">
+      <div className="mx-auto max-w-7xl px-6 pt-28 pb-16 lg:pl-24 relative z-10">
         
         {/* -----------------------------------------------------------
             UNIFIED DUBBED CYBERPUNK HUD INTERFACE PANEL

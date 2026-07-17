@@ -52,7 +52,7 @@ const audiowide = Audiowide({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://harshitgupta.dev"),
-  title: "Harshit Gupta — CSE Student & Full-Stack / AI Engineer",
+  title: "Harshit G. | CSE",
   description:
     "Portfolio of Harshit Gupta, a second-year Computer Science & Engineering student at UIET, Panjab University, building full-stack and AI-powered software — WanderLust, FixIQ, and more.",
   keywords: [
@@ -64,8 +64,11 @@ export const metadata: Metadata = {
     "WanderLust",
     "FixIQ",
   ],
+  icons: {
+    icon: "/icon.png",
+  },
   openGraph: {
-    title: "Harshit Gupta — CSE Student & Full-Stack / AI Engineer",
+    title: "Harshit G. | CSE",
     description:
       "Building full-stack and AI-powered software. Explore projects, skills, and the journey so far.",
     type: "website",
@@ -73,7 +76,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Harshit Gupta — CSE Student & Full-Stack / AI Engineer",
+    title: "Harshit G. | CSE",
   },
 };
 

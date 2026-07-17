@@ -12,6 +12,7 @@ export type Project = {
   future: string[];
   github?: string;
   demo?: string;
+  image?: string;
 };
 
 export const projects: Project[] = [
@@ -44,6 +45,7 @@ export const projects: Project[] = [
     ],
     github: "https://github.com/hars7itIT/WomenHealthCare",
     demo: "https://womenhealthcare.vercel.app",
+    image: "/projects/womenhealthcare.jpg",
   },
   {
     slug: "wanderlust",
@@ -79,6 +81,7 @@ export const projects: Project[] = [
     ],
     github: "https://github.com/hars7itIT/WanderLust",
     demo: "https://wanderlust-sys.onrender.com",
+    image: "/projects/wanderlust.jpg",
   },
   {
     slug: "fixiq",
@@ -112,6 +115,7 @@ export const projects: Project[] = [
     ],
     github: "https://github.com/hars7itIT/FixIQ",
     demo: "https://fixiq-sys.vercel.app",
+    image: "/projects/fixiq.jpg",
   },
   {
     slug: "uiet-attendance-tracker",
@@ -140,5 +144,6 @@ export const projects: Project[] = [
       "Per-student attendance percentage view",
       "Export to spreadsheet for faculty",
     ],
+    image: "/projects/attendance.jpg",
   },
 ];

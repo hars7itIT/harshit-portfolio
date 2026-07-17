@@ -45,14 +45,25 @@ export default function FeaturedProjects() {
             className="rounded-2xl border border-line bg-surface/10 hover:border-cyan-500/30 hover:shadow-[0_0_20px_rgba(6,182,212,0.06)] hover:-translate-y-1 shadow-xl overflow-hidden flex flex-col justify-between group transition-all duration-300"
           >
             {/* Visual Thumbnail */}
-            <div
-              className="h-32 w-full flex items-center justify-center relative select-none"
-              style={{ background: gradients[i] || gradients[0] }}
-            >
-              <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/0 transition-colors" />
-              <span className="font-mono text-xs font-black tracking-widest text-cyan-400/25 group-hover:text-cyan-400/40 transition-colors uppercase">
-                {p.name}
-              </span>
+            <div className="h-44 w-full relative overflow-hidden select-none bg-slate-950/50 border-b border-line">
+              {p.image ? (
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+              ) : (
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{ background: gradients[i] || gradients[0] }}
+                >
+                  <span className="font-mono text-xs font-black tracking-widest text-cyan-400/25 group-hover:text-cyan-400/40 transition-colors uppercase">
+                    {p.name}
+                  </span>
+                </div>
+              )}
+              {/* Subtle dark overlay gradient for integrated styling */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent group-hover:from-slate-950/20 transition-all duration-300" />
             </div>
 
             {/* Info */}

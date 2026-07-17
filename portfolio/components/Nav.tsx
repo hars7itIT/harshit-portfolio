@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { toggleTheme } from "@/components/ThemeInit";
-import { Sun, Moon, Sparkles, BookOpen, ChevronDown, Linkedin, Github, FileText, Mail, ArrowUpRight } from "lucide-react";
-import { socialLinks } from "@/data/profiles";
+import { Sun, Moon, BookOpen, Menu, X, Bot } from "lucide-react";
 
 const SECTIONS = [
   { id: "about", label: "About" },
@@ -20,8 +20,7 @@ export default function Nav() {
   const [isLight, setIsLight] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("");
-  const [linksOpen, setLinksOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsLight(document.documentElement.classList.contains("light-mode"));
@@ -30,14 +29,7 @@ export default function Nav() {
       setScrolled(window.scrollY > 20);
     };
 
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setLinksOpen(false);
-      }
-    };
-
     window.addEventListener("scroll", handleScroll);
-    document.addEventListener("mousedown", handleClickOutside);
 
     // Setup active section tracking
     const observer = new IntersectionObserver(
@@ -51,6 +43,9 @@ export default function Nav() {
       { threshold: 0.15, rootMargin: "-25% 0px -55% 0px" }
     );
 
+    const heroEl = document.getElementById("hero");
+    if (heroEl) observer.observe(heroEl);
+
     SECTIONS.forEach((s) => {
       const el = document.getElementById(s.id);
       if (el) observer.observe(el);
@@ -58,7 +53,6 @@ export default function Nav() {
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      document.removeEventListener("mousedown", handleClickOutside);
       observer.disconnect();
     };
   }, []);
@@ -67,6 +61,8 @@ export default function Nav() {
     toggleTheme();
     setIsLight(document.documentElement.classList.contains("light-mode"));
   };
+
+  const isHomeActive = activeSection === "hero" || activeSection === "";
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
@@ -77,100 +73,57 @@ export default function Nav() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         
         {/* Logo / Status */}
-        <a href="#hero" className="flex items-center gap-2 group">
-          <div className="h-6 w-6 rounded bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold transition-transform group-hover:rotate-12">
-            H
-          </div>
-          <span className="font-mono text-sm text-text font-semibold transition-colors group-hover:text-cyan-400">
-            harshit<span className="text-muted">.sys</span>
+        <a href="#hero" className="flex items-center gap-2 group select-none">
+          <svg viewBox="0 0 100 100" className="h-5 w-5 text-cyan-400 group-hover:scale-105 transition-transform duration-300">
+            <polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="none" stroke="currentColor" strokeWidth="8" />
+            <text x="50" y="58" textAnchor="middle" dominantBaseline="middle" className="font-sans font-black text-[38px] fill-current">H</text>
+          </svg>
+          <span className="font-mono text-sm text-text font-bold transition-colors group-hover:text-cyan-400">
+            Harshit G. <span className="text-slate-500 font-normal">| CSE</span>
           </span>
         </a>
 
-        {/* Section Links */}
-        <ul className="hidden md:flex items-center gap-1.5">
+        {/* Section Links - Desktop (Horizontal Glossy Buttons) */}
+        <ul className="hidden lg:flex items-center gap-1.5 select-none">
           <li>
-            <a href="#hero" className={`nav-btn ${activeSection === "hero" || activeSection === "" ? "active" : ""}`}>
+            <a 
+              href="#hero" 
+              className={`nav-btn flex items-center gap-1 ${isHomeActive ? "active" : ""}`}
+            >
+              {isHomeActive && <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.6)]" />}
               Home
             </a>
           </li>
-          {SECTIONS.map((s) => (
-            <li key={s.id}>
-              <a
-                href={`#${s.id}`}
-                className={`nav-btn ${activeSection === s.id ? "active" : ""}`}
-              >
-                {s.label}
-              </a>
-            </li>
-          ))}
-          <li>
-            <Link href="/ai" className="nav-btn flex items-center gap-1 text-cyan-400 hover:text-cyan-300">
-              <Sparkles size={11} className="animate-pulse" />
-              <span>AI Tools</span>
-            </Link>
-          </li>
-          <li>
-            <Link href="/blog" className="nav-btn flex items-center gap-1 text-purple-400 hover:text-purple-300">
-              <BookOpen size={11} />
-              <span>Blog</span>
-            </Link>
-          </li>
+          {SECTIONS.map((s) => {
+            const isActive = activeSection === s.id;
+            return (
+              <li key={s.id}>
+                <a
+                  href={`#${s.id}`}
+                  className={`nav-btn flex items-center gap-1 ${isActive ? "active" : ""}`}
+                >
+                  {isActive && <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.6)]" />}
+                  {s.label}
+                </a>
+              </li>
+            );
+          })}
         </ul>
 
         {/* Action Widgets */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           
-          {/* Links Dropdown */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setLinksOpen(!linksOpen)}
-              className="nav-btn border-cyan-500/20 bg-cyan-500/5 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 flex items-center gap-1 cursor-pointer"
-            >
-              <FileText size={10} />
-              <span>Links</span>
-              <ChevronDown size={10} className={`transition-transform duration-200 ${linksOpen ? "rotate-180" : ""}`} />
-            </button>
+          {/* AI Toolkit Pill Button */}
+          <Link href="/ai" className="hidden sm:flex nav-btn border-cyan-500/20 bg-cyan-500/5 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 items-center gap-1 cursor-pointer shadow-md select-none">
+            <Bot size={11} className="animate-pulse text-cyan-400" />
+            <span>AI Toolkit</span>
+          </Link>
 
-            {/* Dropdown Menu */}
-            {linksOpen && (
-              <div className="absolute right-0 mt-2 w-44 rounded-xl border border-line bg-ink/95 backdrop-blur-xl p-2.5 shadow-[0_10px_35px_rgba(0,0,0,0.5)] font-mono text-[11px] space-y-1 z-50">
-                <a
-                  href={socialLinks.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-2 rounded-lg text-muted hover:text-text hover:bg-white/5 transition-all"
-                >
-                  <span className="flex items-center gap-2"><Linkedin size={12} className="text-cyan-400" /> LinkedIn</span>
-                  <ArrowUpRight size={10} />
-                </a>
-                <a
-                  href={socialLinks.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-2 rounded-lg text-muted hover:text-text hover:bg-white/5 transition-all"
-                >
-                  <span className="flex items-center gap-2"><Github size={12} className="text-purple-400" /> GitHub</span>
-                  <ArrowUpRight size={10} />
-                </a>
-                <a
-                  href="/resume.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-2 rounded-lg text-muted hover:text-text hover:bg-white/5 transition-all"
-                >
-                  <span className="flex items-center gap-2"><FileText size={12} className="text-pink-400" /> Resume</span>
-                  <ArrowUpRight size={10} />
-                </a>
-                <a
-                  href={`mailto:${socialLinks.email}`}
-                  className="flex items-center justify-between p-2 rounded-lg text-muted hover:text-text hover:bg-white/5 transition-all"
-                >
-                  <span className="flex items-center gap-2"><Mail size={12} className="text-emerald-400" /> Email Me</span>
-                  <ArrowUpRight size={10} />
-                </a>
-              </div>
-            )}
-          </div>
+          {/* Blog Pill Button */}
+          <Link href="/blog" className="hidden sm:flex nav-btn border-cyan-500/20 bg-cyan-500/5 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 items-center gap-1.5 cursor-pointer shadow-md select-none">
+            <BookOpen size={11} className="text-cyan-400" />
+            <span>Blog</span>
+          </Link>
 
           {/* Theme Toggle Button Slider */}
           <button
@@ -184,8 +137,84 @@ export default function Nav() {
             </div>
           </button>
 
+          {/* Hamburger Menu Button - Tablet/Mobile */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden rounded-lg border border-line bg-surface/40 p-2 text-muted hover:text-cyan-400 hover:border-cyan-500/20 transition-all cursor-pointer"
+            aria-label="Toggle Navigation Menu"
+          >
+            {mobileMenuOpen ? <X size={13} /> : <Menu size={13} />}
+          </button>
+
         </div>
       </div>
+
+      {/* Mobile/Tablet Menu Drawer overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="lg:hidden border-t border-line bg-ink/95 backdrop-blur-xl px-6 py-4 overflow-hidden shadow-2xl z-40 relative"
+          >
+            <ul className="flex flex-col gap-2 font-mono text-xs">
+              <li>
+                <a
+                  href="#hero"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block w-full text-left py-2.5 px-4 rounded-xl border border-transparent font-bold uppercase tracking-wider transition-colors ${
+                    isHomeActive
+                      ? "bg-cyan-500/10 border-cyan-500/20 text-cyan-400"
+                      : "text-muted hover:bg-white/5 hover:text-text"
+                  }`}
+                >
+                  Home
+                </a>
+              </li>
+              {SECTIONS.map((s) => (
+                <li key={s.id}>
+                  <a
+                    href={`#${s.id}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`block w-full text-left py-2.5 px-4 rounded-xl border border-transparent font-bold uppercase tracking-wider transition-colors ${
+                      activeSection === s.id
+                        ? "bg-cyan-500/10 border-cyan-500/20 text-cyan-400"
+                        : "text-muted hover:bg-white/5 hover:text-text"
+                    }`}
+                  >
+                    {s.label}
+                  </a>
+                </li>
+              ))}
+              <li className="border-t border-white/5 my-1" />
+              <li>
+                <Link
+                  href="/ai"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block w-full text-left py-2.5 px-4 rounded-xl text-cyan-400 font-bold uppercase tracking-wider hover:bg-white/5"
+                >
+                  <span className="flex items-center gap-2">
+                    <Bot size={13} className="animate-pulse" /> AI Toolkit
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/blog"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block w-full text-left py-2.5 px-4 rounded-xl text-purple-400 font-bold uppercase tracking-wider hover:bg-white/5"
+                >
+                  <span className="flex items-center gap-2">
+                    <BookOpen size={13} /> Blog
+                  </span>
+                </Link>
+              </li>
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

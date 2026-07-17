@@ -22,14 +22,10 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     label: "AI & ML",
-    items: ["Anthropic API", "Prompt Engineering", "LangChain (learning)", "RAG (learning)"],
+    items: ["Machine Learning", "Deep Learning", "NLP Basics", "AI Tools / APIs"],
   },
   {
     label: "Tools",
-    items: ["Git", "GitHub", "VS Code", "Spyder", "Postman"],
-  },
-  {
-    label: "Other",
-    items: ["REST APIs", "Responsive Design", "UI/UX Basics", "SEO Basics"],
+    items: ["Git & GitHub", "VS Code", "Postman", "Docker (Basics)"],
   },
 ];

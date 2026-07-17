@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Download, Cpu, Award, Sparkles, Code, User, Play, Pause, Square, ExternalLink, HardDrive, Terminal, Laptop, HelpCircle } from "lucide-react";
+import { ArrowUpRight, Download, Cpu, Sparkles, Code, Terminal, Wifi } from "lucide-react";
 
 // Types
 type SkillHoverData = {
@@ -108,19 +108,14 @@ export default function Hero() {
     };
   }, []);
 
-  const handleAvatarClick = () => {
+  const handleScrollToProjects = () => {
     triggerBeep("click");
-    window.dispatchEvent(new CustomEvent("jarvis-avatar-click"));
+    document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
   };
 
   const triggerResumeView = () => {
     triggerBeep("click");
-    window.open("/resume.pdf", "_blank");
-  };
-
-  const handleScrollToProjects = () => {
-    triggerBeep("click");
-    document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
+    window.open("/Harshit_Gupta_Resume.docx", "_blank");
   };
 
   return (
@@ -267,7 +262,7 @@ export default function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 5 }}
                 transition={{ duration: 0.15 }}
-                className="absolute left-0 bottom-full mb-2 bg-slate-950/95 border border-cyan-500/35 rounded-xl p-3 shadow-2xl backdrop-blur-md z-30 font-mono text-[9px] min-w-[200px]"
+                className="absolute left-0 bottom-full mb-2 bg-slate-955 border border-cyan-500/35 rounded-xl p-3 shadow-2xl backdrop-blur-md z-30 font-mono text-[9px] min-w-[200px]"
               >
                 <div className="border-b border-white/5 pb-1.5 mb-1.5 flex items-center justify-between">
                   <span className="font-bold text-text uppercase tracking-widest">{hoveredSkill.name}</span>
@@ -330,8 +325,7 @@ export default function Hero() {
           
           {/* Concentric rotating holographic svg rings */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none scale-110">
-            {/* Outer dotted ring: spins clockwise */}
-            <svg className={`w-52 h-52 absolute transform transition-transform ${activeState === 'speaking' ? 'animate-spin' : activeState === 'listening' ? 'animate-spin' : 'animate-pulse'}`} style={{ animationDuration: activeState === 'speaking' ? "8s" : activeState === 'listening' ? "5s" : "15s" }} viewBox="0 0 100 100">
+            <svg className={`w-52 h-52 absolute transform transition-transform ${activeState === 'speaking' || activeState === 'listening' ? 'animate-spin' : 'animate-pulse'}`} style={{ animationDuration: activeState === 'speaking' ? "8s" : activeState === 'listening' ? "5s" : "15s" }} viewBox="0 0 100 100">
               <circle
                 cx="50"
                 cy="50"
@@ -351,8 +345,7 @@ export default function Hero() {
               />
             </svg>
             
-            {/* Middle solid border ring with arrows: spins counter-clockwise */}
-            <svg className={`w-44 h-44 absolute transform transition-transform ${activeState === 'speaking' ? 'animate-spin' : activeState === 'thinking' ? 'animate-spin' : 'animate-pulse'}`} style={{ animationDuration: activeState === 'speaking' ? "5s" : "12s", animationDirection: "reverse" }} viewBox="0 0 100 100">
+            <svg className={`w-44 h-44 absolute transform transition-transform ${activeState === 'speaking' || activeState === 'thinking' ? 'animate-spin' : 'animate-pulse'}`} style={{ animationDuration: activeState === 'speaking' ? "5s" : "12s", animationDirection: "reverse" }} viewBox="0 0 100 100">
               <circle
                 cx="50"
                 cy="50"
@@ -373,7 +366,6 @@ export default function Hero() {
               />
             </svg>
 
-            {/* Inner pulsing border ring */}
             <div className={`w-36 h-36 rounded-full absolute border border-dashed transition-all duration-500 ${
               activeState === "listening"
                 ? "border-purple-500/30 animate-pulse"
@@ -389,7 +381,6 @@ export default function Hero() {
 
           {/* Core circular robot avatar container */}
           <div 
-            onClick={handleAvatarClick}
             className={`relative h-28 w-28 rounded-full border p-1 flex items-center justify-center bg-slate-950/90 shadow-[0_0_30px_rgba(6,182,212,0.05)] cursor-pointer select-none z-10 transition-all duration-500 ${
               activeState === "listening"
                 ? "border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.35)] scale-105"
@@ -408,21 +399,17 @@ export default function Hero() {
               className="h-full w-full object-cover rounded-full"
             />
 
-            {/* Glowing state scanning bar indicator (Thinking state only) */}
+            {/* Glowing state scanning bar indicator */}
             {activeState === "thinking" && (
               <div className="absolute inset-x-0 h-0.5 bg-pink-400 shadow-[0_0_8px_#ec4899] animate-scanline" />
             )}
           </div>
 
-          {/* Floating HUD node texts surrounding centerpiece */}
+          {/* Floating HUD node texts */}
           <div className="absolute inset-0 pointer-events-none select-none">
-            {/* React */}
             <span className="absolute top-2 left-6 text-[7px] text-slate-500 border border-line bg-surface/5 px-1 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse">REACT.JS</span>
-            {/* AI Node */}
             <span className="absolute top-6 right-2 text-[7px] text-purple-400/60 border border-purple-500/10 bg-purple-500/5 px-1 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse" style={{ animationDelay: '0.4s' }}>AI.NODE</span>
-            {/* Node.js */}
             <span className="absolute bottom-4 left-2 text-[7px] text-slate-500 border border-line bg-surface/5 px-1 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse" style={{ animationDelay: '0.8s' }}>NODE.JS</span>
-            {/* C++ */}
             <span className="absolute bottom-6 right-4 text-[7px] text-cyan-400/60 border border-cyan-500/10 bg-cyan-500/5 px-1 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse" style={{ animationDelay: '1.2s' }}>C++</span>
           </div>
 

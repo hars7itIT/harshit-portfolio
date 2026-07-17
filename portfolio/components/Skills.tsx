@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import SectionHeading from "./SectionHeading";
 import { skillGroups } from "@/data/skills";
-import { Sparkles, Terminal, Code2, Layers, Cpu, Wrench, ShieldAlert, Award } from "lucide-react";
+import { Sparkles, Terminal, Code2, Layers, Cpu, Wrench, ShieldAlert, Award, Rocket, CheckCircle2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const GROUP_ICONS: Record<string, any> = {
@@ -86,110 +86,146 @@ export default function Skills() {
       {/* Main Grid: Radar Chart + Skill Cards */}
       <div className="mt-12 grid gap-8 lg:grid-cols-12 items-start">
         
-        {/* LEFT COLUMN: Animated Holographic Radar Chart (Span 5) */}
-        <div className="lg:col-span-5 flex flex-col items-center bg-slate-950/40 border border-line rounded-2xl p-5 shadow-2xl backdrop-blur-md relative overflow-hidden group hover:border-cyan-500/20 transition-all duration-300">
-          {/* Glowing Corners */}
-          <div className="absolute top-0 left-0 h-1.5 w-1.5 border-t border-l border-cyan-400" />
-          <div className="absolute top-0 right-0 h-1.5 w-1.5 border-t border-r border-cyan-400" />
-          <div className="absolute bottom-0 left-0 h-1.5 w-1.5 border-b border-l border-cyan-400" />
-          <div className="absolute bottom-0 right-0 h-1.5 w-1.5 border-b border-r border-cyan-400" />
-
-          <div className="w-full border-b border-white/5 pb-2 mb-4 font-mono text-[9px] font-bold text-slate-500 uppercase tracking-widest text-left">
-            // Core Competencies Radar
-          </div>
-
-          <div className="relative w-full flex justify-center">
-            {/* SVG Radar */}
-            <svg className="w-[300px] h-[280px]" viewBox="0 0 300 280">
-              {/* Concentric grid rings: 20%, 40%, 60%, 80%, 100% */}
-              {[0.2, 0.4, 0.6, 0.8, 1.0].map((scale, gridIdx) => {
-                const ringPoints = RADAR_AXES.map((axis, i) => {
+        {/* LEFT COLUMN: Radar Chart & Metrics (Span 5) */}
+        <div className="lg:col-span-5 flex flex-col gap-6 w-full">
+          {/* Animated Holographic Radar Chart */}
+          <div className="flex flex-col items-center bg-slate-950/40 border border-line rounded-2xl p-5 shadow-2xl backdrop-blur-md relative overflow-hidden group hover:border-cyan-500/20 transition-all duration-300 w-full">
+            {/* Glowing Corners */}
+            <div className="absolute top-0 left-0 h-1.5 w-1.5 border-t border-l border-cyan-400" />
+            <div className="absolute top-0 right-0 h-1.5 w-1.5 border-t border-r border-cyan-400" />
+            <div className="absolute bottom-0 left-0 h-1.5 w-1.5 border-b border-l border-cyan-400" />
+            <div className="absolute bottom-0 right-0 h-1.5 w-1.5 border-b border-r border-cyan-400" />
+ 
+            <div className="w-full border-b border-white/5 pb-2 mb-4 font-mono text-[9px] font-bold text-slate-500 uppercase tracking-widest text-left">
+              // Core Competencies Radar
+            </div>
+ 
+            <div className="relative w-full flex justify-center">
+              {/* SVG Radar */}
+              <svg className="w-full max-w-[300px] h-auto aspect-[300/280]" viewBox="0 0 300 280">
+                {/* Concentric grid rings: 20%, 40%, 60%, 80%, 100% */}
+                {[0.2, 0.4, 0.6, 0.8, 1.0].map((scale, gridIdx) => {
+                  const ringPoints = RADAR_AXES.map((axis, i) => {
+                    const angleRad = (axis.angle - 90) * (Math.PI / 180);
+                    const r = maxRadius * scale;
+                    const x = centerX + r * Math.cos(angleRad);
+                    const y = centerY + r * Math.sin(angleRad);
+                    return `${x},${y}`;
+                  }).join(" ");
+                  return (
+                    <polygon
+                      key={gridIdx}
+                      points={ringPoints}
+                      className="fill-none stroke-white/5 stroke-dasharray-[2,2]"
+                      strokeWidth="0.5"
+                    />
+                  );
+                })}
+ 
+                {/* Axis lines */}
+                {RADAR_AXES.map((axis, i) => {
                   const angleRad = (axis.angle - 90) * (Math.PI / 180);
-                  const r = maxRadius * scale;
-                  const x = centerX + r * Math.cos(angleRad);
-                  const y = centerY + r * Math.sin(angleRad);
-                  return `${x},${y}`;
-                }).join(" ");
-                return (
+                  const x = centerX + maxRadius * Math.cos(angleRad);
+                  const y = centerY + maxRadius * Math.sin(angleRad);
+                  return (
+                    <line
+                      key={i}
+                      x1={centerX}
+                      y1={centerY}
+                      x2={x}
+                      y2={y}
+                      className="stroke-white/5"
+                      strokeWidth="0.5"
+                    />
+                  );
+                })}
+ 
+                {/* Axis Labels */}
+                {RADAR_AXES.map((axis, i) => {
+                  const angleRad = (axis.angle - 90) * (Math.PI / 180);
+                  const offset = 18;
+                  const x = centerX + (maxRadius + offset) * Math.cos(angleRad);
+                  const y = centerY + (maxRadius + offset) * Math.sin(angleRad) + 3;
+                  let textAnchor: "start" | "end" | "middle" = "middle";
+                  if (Math.cos(angleRad) > 0.1) textAnchor = "start";
+                  else if (Math.cos(angleRad) < -0.1) textAnchor = "end";
+ 
+                  return (
+                    <text
+                      key={i}
+                      x={x}
+                      y={y}
+                      className="font-mono text-[8px] font-bold fill-slate-500 uppercase tracking-wide"
+                      textAnchor={textAnchor}
+                    >
+                      {axis.label}
+                    </text>
+                  );
+                })}
+ 
+                {/* Plotted Shape */}
+                {radarProgress > 0 && (
                   <polygon
-                    key={gridIdx}
-                    points={ringPoints}
-                    className="fill-none stroke-white/5 stroke-dasharray-[2,2]"
-                    strokeWidth="0.5"
-                  />
-                );
-              })}
-
-              {/* Axis lines */}
-              {RADAR_AXES.map((axis, i) => {
-                const angleRad = (axis.angle - 90) * (Math.PI / 180);
-                const x = centerX + maxRadius * Math.cos(angleRad);
-                const y = centerY + maxRadius * Math.sin(angleRad);
-                return (
-                  <line
-                    key={i}
-                    x1={centerX}
-                    y1={centerY}
-                    x2={x}
-                    y2={y}
-                    className="stroke-white/5"
-                    strokeWidth="0.5"
-                  />
-                );
-              })}
-
-              {/* Axis Labels */}
-              {RADAR_AXES.map((axis, i) => {
-                const angleRad = (axis.angle - 90) * (Math.PI / 180);
-                const offset = 18;
-                const x = centerX + (maxRadius + offset) * Math.cos(angleRad);
-                const y = centerY + (maxRadius + offset) * Math.sin(angleRad) + 3;
-                let textAnchor: "start" | "end" | "middle" = "middle";
-                if (Math.cos(angleRad) > 0.1) textAnchor = "start";
-                else if (Math.cos(angleRad) < -0.1) textAnchor = "end";
-
-                return (
-                  <text
-                    key={i}
-                    x={x}
-                    y={y}
-                    className="font-mono text-[8px] font-bold fill-slate-500 uppercase tracking-wide"
-                    textAnchor={textAnchor}
-                  >
-                    {axis.label}
-                  </text>
-                );
-              })}
-
-              {/* Plotted Shape */}
-              {radarProgress > 0 && (
-                <polygon
-                  points={pointsPath}
-                  className="fill-cyan-500/15 stroke-cyan-400/70"
-                  strokeWidth="1.5"
-                />
-              )}
-
-              {/* Plotted shape nodes */}
-              {RADAR_AXES.map((axis, i) => {
-                if (radarProgress === 0) return null;
-                const coords = getCoordinates(i, axis.value).split(",");
-                return (
-                  <circle
-                    key={i}
-                    cx={coords[0]}
-                    cy={coords[1]}
-                    r="3"
-                    className="fill-slate-950 stroke-cyan-400"
+                    points={pointsPath}
+                    className="fill-cyan-500/15 stroke-cyan-400/70"
                     strokeWidth="1.5"
                   />
-                );
-              })}
-            </svg>
+                )}
+ 
+                {/* Plotted shape nodes */}
+                {RADAR_AXES.map((axis, i) => {
+                  if (radarProgress === 0) return null;
+                  const coords = getCoordinates(i, axis.value).split(",");
+                  return (
+                    <circle
+                      key={i}
+                      cx={coords[0]}
+                      cy={coords[1]}
+                      r="3"
+                      className="fill-slate-950 stroke-cyan-400"
+                      strokeWidth="1.5"
+                    />
+                  );
+                })}
+              </svg>
+            </div>
+ 
+            <div className="w-full text-center mt-3 text-[9px] text-muted leading-relaxed font-sans font-medium">
+              Radar values represent weighted competence mappings based on shipped codebases, academic projects, and conceptual understanding.
+            </div>
           </div>
-
-          <div className="w-full text-center mt-3 text-[9px] text-muted leading-relaxed font-sans font-medium">
-            Radar values represent weighted competence mappings based on shipped codebases, academic projects, and conceptual understanding.
+ 
+          {/* Metrics Card */}
+          <div className="grid grid-cols-4 bg-slate-950/40 border border-line rounded-2xl p-4 text-center shadow-2xl backdrop-blur-md relative overflow-hidden group hover:border-cyan-500/20 transition-all duration-300 w-full select-none">
+            {/* Glowing Corners */}
+            <div className="absolute top-0 left-0 h-1.5 w-1.5 border-t border-l border-cyan-400" />
+            <div className="absolute top-0 right-0 h-1.5 w-1.5 border-t border-r border-cyan-400" />
+            <div className="absolute bottom-0 left-0 h-1.5 w-1.5 border-b border-l border-cyan-400" />
+            <div className="absolute bottom-0 right-0 h-1.5 w-1.5 border-b border-r border-cyan-400" />
+ 
+            <div className="flex flex-col items-center justify-center py-1 border-r border-line/30">
+              <Code2 className="h-4.5 w-4.5 text-cyan-400 mb-1.5 group-hover:scale-110 transition-transform duration-300" />
+              <span className="font-mono text-sm font-bold text-text">50+</span>
+              <span className="font-mono text-[7px] text-slate-500 uppercase tracking-widest mt-1">Projects</span>
+            </div>
+ 
+            <div className="flex flex-col items-center justify-center py-1 border-r border-line/30">
+              <Layers className="h-4.5 w-4.5 text-cyan-400 mb-1.5 group-hover:scale-110 transition-transform duration-300" />
+              <span className="font-mono text-sm font-bold text-text">6+</span>
+              <span className="font-mono text-[7px] text-slate-500 uppercase tracking-widest mt-1">Tech Domains</span>
+            </div>
+ 
+            <div className="flex flex-col items-center justify-center py-1 border-r border-line/30">
+              <Rocket className="h-4.5 w-4.5 text-cyan-400 mb-1.5 group-hover:scale-110 transition-transform duration-300" />
+              <span className="font-mono text-sm font-bold text-text">10K+</span>
+              <span className="font-mono text-[7px] text-slate-500 uppercase tracking-widest mt-1">Lines of Code</span>
+            </div>
+ 
+            <div className="flex flex-col items-center justify-center py-1">
+              <CheckCircle2 className="h-4.5 w-4.5 text-cyan-400 mb-1.5 group-hover:scale-110 transition-transform duration-300" />
+              <span className="font-mono text-sm font-bold text-text">100%</span>
+              <span className="font-mono text-[7px] text-slate-500 uppercase tracking-widest mt-1">Commitment</span>
+            </div>
           </div>
         </div>
 
@@ -206,15 +242,15 @@ export default function Skills() {
                 transition={{ duration: 0.4, delay: i * 0.03 }}
                 className="glass-card group overflow-hidden border border-line bg-surface/10 hover:border-cyan-500/25 transition-all"
               >
-                {/* Header Tab */}
                 <div className="flex items-center justify-between border-b border-line bg-surface/15 px-4 py-2.5">
                   <div className="flex items-center gap-2">
                     <Icon className="h-3.5 w-3.5 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
                     <span className="font-mono text-[10px] font-bold text-text uppercase tracking-wider">{group.label}</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-400/60" />
-                    <span className="h-1.5 w-1.5 rounded-full bg-purple-400/60" />
+                  <div className="flex items-center gap-1">
+                    <span className="h-1 w-1 rounded-full bg-cyan-400/50" />
+                    <span className="h-1 w-1 rounded-full bg-purple-400/50" />
+                    <span className="h-1 w-1 rounded-full bg-pink-400/50" />
                   </div>
                 </div>
 
